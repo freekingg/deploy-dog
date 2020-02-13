@@ -12,11 +12,17 @@ $ npm run dev
 ```
 
 ## :sparkles: screenshot
+
 **项目管理**
+
 ![avatar](./screenshort1.png)
+
 **添加项目**
+
 ![avatar](./screenshort2.png)
+
 **发布进度**
+
 ![avatar](./screenshort3.png)
 
 ## 部署流程
