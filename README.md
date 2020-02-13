@@ -1,6 +1,7 @@
 # 部署狗
 
-适用与个人与小团队的轻量级自动部署工具
+- 适用与个人与小团队的轻量级自动部署工具
+- 基于electron+vue+element开发
 
 ## :tada: 技术棧
 - electron-vue
