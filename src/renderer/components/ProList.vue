@@ -1,6 +1,5 @@
 <template>
   <div id="wrapper">
-    <!-- <img id="logo"  src="~@/assets/logo.png" alt="electron-vue" /> -->
     <Null v-if="!dataList.length" />
     <el-row :gutter="20" class="pro-list">
       <el-col :span="12" v-for="(item, index) in dataList" :key="index">

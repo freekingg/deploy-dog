@@ -4,7 +4,8 @@ const node_ssh = require('node-ssh');
 const zipFile = require('compressing')// 压缩zip
 
 let SSH = new node_ssh(); // 生成ssh实例
-let mainWindow = null;
+let mainWindow = null; // 窗口实例,用于向向渲染进程通信
+
 // 部署流程入口
 const deploy = async (config, mainWindows) => {
     mainWindow = mainWindows
@@ -16,7 +17,7 @@ const deploy = async (config, mainWindows) => {
 //压缩代码
 const startZip = async (config) => {
     return new Promise((resolve, reject) => {
-        let { distPath, host } = config;
+        let { distPath } = config;
         let distZipPath = path.resolve(distPath, `../dist.zip`);
         mainWindow.send('deploy', '本地项目开始压缩')
         zipFile.zip.compressDir(distPath, distZipPath).then(res => {
@@ -36,7 +37,6 @@ const connectSSH = async (config) => {
         SSH.connect({
             host: config.host,
             username: config.username,
-            // privateKey: config.PRIVATE_KEY, //秘钥登录(推荐) 方式一
             password: config.password // 密码登录 方式二
         }).then(res => {
             mainWindow.send('deploy', `连接服务器成功:${config.host}`)
@@ -58,7 +58,6 @@ const clearOldFile = async (config) => {
     mainWindow.send('deploy', `清空服务器目录${config.webDir}内的文件完成`)
 }
 
-
 //上传zip文件到服务器
 const uploadZipBySSH = async (config) => {
     let distZipPath = path.resolve(config.distPath, `../dist.zip`);
@@ -73,15 +72,13 @@ const uploadZipBySSH = async (config) => {
         mainWindow.send('deploy', `删除上传到服务器的文件成功`)
 
         //将解压后的文件夹内的所有文件移动到目标目录
-        var dir = path.basename(path.join(config.webDir))
+        var dir = path.basename(path.join(config.distPath))
         mainWindow.send('deploy', `将${config.webDir}/${dir}/内解压的文件移动到目录${config.webDir}`)
-        await SSH.execCommand(`mv -f ${config.webDir}/${dir}/*  ${config.webDir}`);
+        await SSH.execCommand(`mv - f ${config.webDir}/${dir}/*  ${config.webDir}`);
         await SSH.execCommand(`rm -rf ${config.webDir}/${dir}`); //移出后删除 dist 文件夹
         mainWindow.send('deploy', `全部完成`)
         SSH.dispose(); //断开连接
     } catch (error) {
-        // errorLog(error);
-        // errorLog('上传失败!');
         mainWindow.send('deploy', `文件上传到服务器失败:${error}`)
         // process.exit(); //退出流程
     }
